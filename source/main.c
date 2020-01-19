@@ -3,11 +3,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define DEFAULT_NRO "sdmc:/switch/overlays/tesla.ovl"
+#define DEFAULT_NRO "sdmc:/switch/.overlays/ovlmenu.ovl"
 
 const char g_noticeText[] =
-    "nx-hbloader " VERSION "\0"
-    "Do you mean to tell me that you're thinking seriously of building that way, when and if you are an architect?";
+    "nx-ovlloader " VERSION "\0"
+    "What's the most resilient parasite? A bacteria? A virus? An intestinal worm? An idea. Resilient, highly contagious.";
 
 static char g_argv[2048];
 static char g_nextArgv[2048];
@@ -16,8 +16,6 @@ u64  g_nroAddr = 0;
 static u64  g_nroSize = 0;
 static NroHeader g_nroHeader;
 static bool g_isApplication = 0;
-
-static bool g_smCloseWorkaround = false;
 
 static u64 g_appletHeapSize = 0;
 static u64 g_appletHeapReservationSize = 0;
@@ -34,8 +32,8 @@ bool __nx_fsdev_support_cwd = false;
 // Used by trampoline.s
 Result g_lastRet = 0;
 
-extern void* __stack_top;//Defined in libnx.
-#define STACK_SIZE 0x100000 //Change this if main-thread stack size ever changes.
+extern void* __stack_top; // Defined in libnx.
+#define STACK_SIZE 0x100000 // Change this if main-thread stack size ever changes.
 
 void __libnx_initheap(void)
 {
@@ -153,14 +151,6 @@ void loadNro(void)
     size_t rw_size=0;
     Result rc=0;
 
-    if (g_smCloseWorkaround) {
-        // For old applications, wait for SM to handle closing the SM session from this process.
-        // If we don't do this, smInitialize will fail once eventually used later.
-        // This is caused by a bug in old versions of libnx that was fixed in commit 68a77ac950.
-        g_smCloseWorkaround = false;
-        svcSleepThread(1000000000);
-    }
-
     memcpy((u8*)armGetTls() + 0x100, g_savedTls, 0x100);
 
     if (g_nroSize > 0)
@@ -240,10 +230,6 @@ void loadNro(void)
 
     rw_size = header->segments[2].size + header->bss_size;
     rw_size = (rw_size+0xFFF) & ~0xFFF;
-
-    bool has_mod0 = false;
-    if (start->mod_offset > 0 && start->mod_offset <= (total_size-0x24)) // Validate MOD0 offset
-        has_mod0 = *(uint32_t*)(nrobuf + start->mod_offset) == 0x30444F4D; // Validate MOD0 header
 
     int i;
     for (i=0; i<3; i++)
@@ -347,13 +333,6 @@ void loadNro(void)
     g_nroSize = nro_size;
 
     memset(__stack_top - STACK_SIZE, 0, STACK_SIZE);
-
-    if (!has_mod0) {
-        // Apply sm-close workaround to NROs which do not contain a valid MOD0 header.
-        // This heuristic is based on the fact that MOD0 support was added very shortly after
-        // the fix for the sm-close bug (in fact, two commits later).
-        g_smCloseWorkaround = true;
-    }
 
     extern NORETURN void nroEntrypointTrampoline(u64 entries_ptr, u64 handle, u64 entrypoint);
     nroEntrypointTrampoline((u64) entries, -1, entrypoint);
