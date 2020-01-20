@@ -15,7 +15,6 @@ static char g_nextNroPath[512];
 u64  g_nroAddr = 0;
 static u64  g_nroSize = 0;
 static NroHeader g_nroHeader;
-static bool g_isApplication = 0;
 
 static u64 g_appletHeapSize = 0;
 static u64 g_appletHeapReservationSize = 0;
@@ -299,13 +298,6 @@ void loadNro(void)
         { EntryType_HosVersion,           0, {0, 0} },
         { EntryType_EndOfList,            0, {(u64)(uintptr_t)g_noticeText, sizeof(g_noticeText)} }
     };
-
-    ConfigEntry *entry_AppletType = &entries[2];
-
-    if (g_isApplication) {
-        entry_AppletType->Value[0] = AppletType_SystemApplication;
-        entry_AppletType->Value[1] = EnvAppletFlags_ApplicationOverride;
-    }
 
     // MainThreadHandle
     entries[0].Value[0] = envGetMainThreadHandle();
