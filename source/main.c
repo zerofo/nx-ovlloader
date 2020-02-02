@@ -1,4 +1,6 @@
 #include <switch.h>
+
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -71,8 +73,12 @@ void __appInit(void)
 
 void __wrap_exit(void)
 {
-    // exit() effectively never gets called, so let's stub it out.
-    fatalThrow(MAKERESULT(Module_HomebrewLoader, 39));
+    pmshellInitialize();
+    pmshellTerminateProgram(0x010000000007E51A);
+    pmshellExit();
+
+    while (1)
+        svcSleepThread(INT64_MAX);
 }
 
 static void*  g_heapAddr;
@@ -203,7 +209,7 @@ void loadNro(void)
 
     int fd = open(g_nextNroPath, O_RDONLY);
     if (fd < 0)
-        fatalThrow(MAKERESULT(Module_HomebrewLoader, 3));
+        exit(1);
 
     // Reset NRO path to load hbmenu by default next time.
     g_nextNroPath[0] = '\0';
