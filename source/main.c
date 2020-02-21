@@ -190,10 +190,10 @@ void loadNro(void)
     }
 
     if (g_nextNroPath[0] == '\0')
-    {
         memcpy(g_nextNroPath, DEFAULT_NRO, sizeof(DEFAULT_NRO));
+
+    if (g_nextArgv[0] == '\0')
         memcpy(g_nextArgv,    DEFAULT_NRO, sizeof(DEFAULT_NRO));
-    }
 
     memcpy(g_argv, g_nextArgv, sizeof g_argv);
 
