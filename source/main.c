@@ -340,6 +340,12 @@ int main(int argc, char **argv)
 {   
     memcpy(g_savedTls, (u8*)armGetTls() + 0x100, 0x100);
     smExit(); // Close SM as we don't need it anymore.
+    
+    // Tesla exhausts service sessions which crashes qlaunch when run on a firmware lower than 9.0.0
+    // Instead of crashing, gracefully kill nx-ovlloader before it causes issues
+    if (hosversionBefore(9,0,0))
+        exit(1);
+
     setupHbHeap();
     getOwnProcessHandle();
     loadNro();
