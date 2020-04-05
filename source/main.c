@@ -34,7 +34,7 @@ bool __nx_fsdev_support_cwd = false;
 Result g_lastRet = 0;
 
 extern void* __stack_top; // Defined in libnx.
-#define STACK_SIZE 0x100000 // Change this if main-thread stack size ever changes.
+#define STACK_SIZE 0x10000 // Change this if main-thread stack size ever changes.
 
 void __libnx_initheap(void)
 {
@@ -61,7 +61,7 @@ void __appInit(void)
         rc = setsysGetFirmwareVersion(&fw);
         if (R_SUCCEEDED(rc))
             hosversionSet(MAKEHOSVERSION(fw.major, fw.minor, fw.micro));
-        g_appletHeapSize = (0x600000 + 0x1FFFFF) & ~0x1FFFFF;
+        g_appletHeapSize = 0x400000;
         g_appletHeapReservationSize = 0x00;
         setsysExit();
     }
@@ -69,13 +69,17 @@ void __appInit(void)
     rc = fsInitialize();
     if (R_FAILED(rc))
         fatalThrow(MAKERESULT(Module_HomebrewLoader, 2));
+
+    smExit(); // Close SM as we don't need it anymore.
 }
 
 void __wrap_exit(void)
 {
+    smInitialize();
     pmshellInitialize();
     pmshellTerminateProgram(0x010000000007E51A);
     pmshellExit();
+    smExit();
 
     while (1)
         svcSleepThread(INT64_MAX);
@@ -179,7 +183,7 @@ void loadNro(void)
         if (R_FAILED(rc))
             fatalThrow(MAKERESULT(Module_HomebrewLoader, 25));
 
-       // .data + .bss
+        // .data + .bss
         rc = svcUnmapProcessCodeMemory(
             g_procHandle, g_nroAddr + header->segments[2].file_off, ((u64) g_heapAddr) + header->segments[2].file_off, rw_size);
 
@@ -203,32 +207,40 @@ void loadNro(void)
     header = (NroHeader*) (nrobuf + sizeof(NroStart));
     uint8_t*   rest   = (uint8_t*)   (nrobuf + sizeof(NroStart) + sizeof(NroHeader));
     
-    rc = fsdevMountSdmc();
+    FsFileSystem sdmc;
+    rc = fsOpenSdCardFileSystem(&sdmc);
     if (R_FAILED(rc))
         fatalThrow(MAKERESULT(Module_HomebrewLoader, 404));
 
-    int fd = open(g_nextNroPath, O_RDONLY);
-    if (fd < 0)
+    FsFile fd;
+    rc = fsFsOpenFile(&sdmc, g_nextNroPath + 5, FsOpenMode_Read, &fd);
+    if (R_FAILED(rc)) {
+        fsFsClose(&sdmc);
         exit(1);
+    }
 
     // Reset NRO path to load hbmenu by default next time.
     g_nextNroPath[0] = '\0';
 
-    if (read(fd, start, sizeof(*start)) != sizeof(*start))
+    s64 offset=0;
+    u64 bytes_read;
+    if (R_FAILED(fsFileRead(&fd, offset, start, sizeof(*start), FsReadOption_None, &bytes_read)) || bytes_read != sizeof(*start))
         fatalThrow(MAKERESULT(Module_HomebrewLoader, 4));
+    offset+=sizeof(*start);
 
-    if (read(fd, header, sizeof(*header)) != sizeof(*header))
+    if (R_FAILED(fsFileRead(&fd, offset, header, sizeof(*header), FsReadOption_None, &bytes_read)) || bytes_read != sizeof(*header))
         fatalThrow(MAKERESULT(Module_HomebrewLoader, 4));
+    offset+=sizeof(*header);
 
     if (header->magic != NROHEADER_MAGIC)
         fatalThrow(MAKERESULT(Module_HomebrewLoader, 5));
 
     size_t rest_size = header->size - (sizeof(NroStart) + sizeof(NroHeader));
-    if (read(fd, rest, rest_size) != rest_size)
+    if (R_FAILED(fsFileRead(&fd, offset, rest, rest_size, FsReadOption_None, &bytes_read)) || bytes_read != rest_size)
         fatalThrow(MAKERESULT(Module_HomebrewLoader, 7));
 
-    close(fd);
-    fsdevUnmountAll();
+    fsFileClose(&fd);
+    fsFsClose(&sdmc);
 
     size_t total_size = header->size + header->bss_size;
     total_size = (total_size+0xFFF) & ~0xFFF;
@@ -339,7 +351,6 @@ void loadNro(void)
 int main(int argc, char **argv)
 {   
     memcpy(g_savedTls, (u8*)armGetTls() + 0x100, 0x100);
-    smExit(); // Close SM as we don't need it anymore.
     
     // Tesla exhausts service sessions which crashes qlaunch when run on a firmware lower than 9.0.0
     // Instead of crashing, gracefully kill nx-ovlloader before it causes issues
