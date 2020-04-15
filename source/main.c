@@ -77,7 +77,7 @@ void __wrap_exit(void)
 {
     smInitialize();
     pmshellInitialize();
-    pmshellTerminateProgram(0x010000000007E51A);
+    pmshellTerminateProgram(0x420000000007E51A);
     pmshellExit();
     smExit();
 
@@ -351,11 +351,6 @@ void loadNro(void)
 int main(int argc, char **argv)
 {   
     memcpy(g_savedTls, (u8*)armGetTls() + 0x100, 0x100);
-    
-    // Tesla exhausts service sessions which crashes qlaunch when run on a firmware lower than 9.0.0
-    // Instead of crashing, gracefully kill nx-ovlloader before it causes issues
-    if (hosversionBefore(9,0,0))
-        exit(1);
 
     setupHbHeap();
     getOwnProcessHandle();
