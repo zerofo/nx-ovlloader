@@ -75,14 +75,8 @@ void __appInit(void)
 
 void __wrap_exit(void)
 {
-    smInitialize();
-    pmshellInitialize();
-    pmshellTerminateProgram(0x420000000007E51A);
-    pmshellExit();
-    smExit();
-
-    while (1)
-        svcSleepThread(INT64_MAX);
+    svcExitProcess();
+    __builtin_unreachable();
 }
 
 static void*  g_heapAddr;
