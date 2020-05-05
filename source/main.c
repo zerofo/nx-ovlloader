@@ -343,7 +343,10 @@ void loadNro(void)
 }
 
 int main(int argc, char **argv)
-{   
+{
+    if (hosversionBefore(9,0,0))
+        exit(1);
+
     memcpy(g_savedTls, (u8*)armGetTls() + 0x100, 0x100);
 
     setupHbHeap();
