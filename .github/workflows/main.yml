@@ -29,7 +29,9 @@ jobs:
       run: |
         git config --global --add safe.directory `pwd`
         make -j $(nproc)
-        ls build
+        ls build -la
+        ls build/exefs -la
+        
         cd build
         mkdir -p atmosphere\contents\420000000007E51A\flags
         cp exefs atmosphere\contents\420000000007E51A\exefs.nsp
