@@ -27,13 +27,13 @@ jobs:
         submodules: recursive
     - name: Build
       run: |
-        git config --global --add safe.directory `pwd`
-        make -j $(nproc)
-        mkdir -p atmosphere/contents/420000000007E51A/flags
-        cp ovll.nsp atmosphere/contents/420000000007E51A/exefs.nsp
-        cp toolbox.json atmosphere/contents/420000000007E51A
-        touch atmosphere/contents/420000000007E51A/flags/boot2.flag
-        zip -r nx-ovlloader.zip atmosphere 
+        git config --global --add safe.directory `pwd`；
+        make -j $(nproc)；
+        mkdir -p atmosphere/contents/420000000007E51A/flags；
+        cp ovll.nsp atmosphere/contents/420000000007E51A/exefs.nsp；
+        cp toolbox.json atmosphere/contents/420000000007E51A；
+        touch atmosphere/contents/420000000007E51A/flags/boot2.flag；
+        zip -r nx-ovlloader.zip atmosphere ；
     - name: Upload file
       uses: actions/upload-artifact@v4
       with:
