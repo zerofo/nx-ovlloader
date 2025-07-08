@@ -29,7 +29,7 @@ jobs:
     - name: Build
       run: |
         git config --global --add safe.directory `pwd`
-        make TARGET=hbl -j $(nproc)
+        make TARGET=hbl all -j $(nproc)
         ls
     - name: Upload file
       uses: actions/upload-artifact@v4
