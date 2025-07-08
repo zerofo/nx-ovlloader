@@ -15,12 +15,12 @@ jobs:
     container: devkitpro/devkita64:latest
 
     steps:
-    - name: spliting string
-      uses: winterjung/split@v2.1.0
-      id: repo
-      with:
-        msg: ${{ github.repository }}
-        separator: '/'
+    # - name: spliting string
+    #   uses: winterjung/split@v2.1.0
+    #   id: repo
+    #   with:
+    #     msg: ${{ github.repository }}
+    #     separator: '/'
     - name: Checkout
       uses: actions/checkout@master
       with:
@@ -30,6 +30,7 @@ jobs:
       run: |
         git config --global --add safe.directory `pwd`
         make TARGET=hbl -j $(nproc)
+        ls
     - name: Upload file
       uses: actions/upload-artifact@v4
       with:
