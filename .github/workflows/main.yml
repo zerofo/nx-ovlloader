@@ -33,13 +33,13 @@ jobs:
     - name: Upload file
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ steps.repo.outputs._1 }} 
-        path: ./*.nsp
+        # name: ${{ steps.repo.outputs._1 }} 
+        path: ./hbl.nsp
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.release_token }}
-        file: ./*.nsp
+        file: ./hbl.nsp
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
