@@ -33,27 +33,20 @@ jobs:
         apt install imagemagick tree -y
         #tree .
         mkdir -p hblmenu_NSP/exefs
-        mkdir -p hblmenu_NSP/romfs
-        mkdir -p hblmenu_NSP/logo
         cp build/exefs/* hblmenu_NSP/exefs/
-        echo "sdmc:/hbmenu.nro" >  hblmenu_NSP/romfs/nextNroPath
-        echo "sdmc:/hbmenu.nro" >  hblmenu_NSP/romfs/nextArgv
-        wget https://raw.githubusercontent.com/zerofo/nx-ovlloader/refs/heads/main/hbl.json
-        sed -i "s#010000000000100D#010078787878100D#g" hbl.json
-        sed -i "s#hbloader#hblmenu#g" hbl.json
-        
+       
         npdmtool hbl.json hblmenu_NSP/exefs/main.npdm
         
         wget https://raw.githubusercontent.com/switchbrew/nx-hbmenu/refs/heads/master/icon.jpg
-        convert icon.jpg -resize 256x256! -alpha set -depth 8 rgba:icon.png
-        cp icon.png hblmenu_NSP/logo/Logo.png
-        nacptool --create "hblmenu" "zerofo" "v0.1" hblmenu_NSP/control.nacp 
+        convert icon.jpg -resize 256x256! -alpha set -depth 8 rgba:icon_AmericanEnglish.jpg
+        cp icon_AmericanEnglish.jpg hblmenu_NSP/control/icon_AmericanEnglish.dat
+        nacptool --create "hblmenu" "zerofo" "v0.1" hblmenu_NSP/control/control.nacp 
         ################### packing NSP #####################
         #wget https://github.com/DeaconBlood/PROD.KEYS/releases/latest/download/prod.keys
         wget https://github.com/DeaconBlood/PROD.KEYS/releases/download/KEYS/prod.keys
         wget https://github.com/zerofo/hacBrewPack/releases/latest/download/hacbrewpack
         sudo -E chmod +x ./hacbrewpack
-        ./hacbrewpack -k prod.keys --exefsdir hblmenu_NSP/exefs/ --controldir hblmenu_NSP/  --titleid 010078787878100D --romfsdir hblmenu_NSP/romfs --logodir hblmenu_NSP/logo --nspdir output
+        ./hacbrewpack -k prod.keys --exefsdir hblmenu_NSP/exefs/ --controldir hblmenu_NSP/  --titleid 010078787878100D --noromfs --nologo --nspdir output
         mv ./output/010078787878100d.nsp ./output/hblmenu-NSP_010078787878100d.nsp
     - name: Upload file
       uses: actions/upload-artifact@v4
