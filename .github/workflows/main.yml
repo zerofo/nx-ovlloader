@@ -44,16 +44,18 @@ jobs:
         wget https://github.com/zerofo/hacBrewPack/releases/latest/download/hacbrewpack
         sudo -E chmod +x ./hacbrewpack
         ./hacbrewpack -k prod.keys --exefsdir hblmenu_NSP/exefs/ --controldir hblmenu_NSP/  --titleid 010078787878100D --romfsdir hblmenu_NSP/romfs --nologo --nspdir output
+        pwd
+        ls ./output/010078787878100D.nsp
     - name: Upload file
       uses: actions/upload-artifact@v4
       with:
         # name: ${{ steps.repo.outputs._1 }} 
-        path: output/010078787878100D.nsp
+        path: ./output/010078787878100D.nsp
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.release_token }}
-        file: output/010078787878100D.nsp
+        file: ./output/010078787878100D.nsp
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
