@@ -40,7 +40,8 @@ jobs:
         cp icon.png hblmenu_NSP/romfs/NintendoLogo.png
         nacptool --create "hblmenu" "zerofo" "v0.1" hblmenu_NSP/control.nacp 
         ################### packing NSP #####################
-        wget https://github.com/DeaconBlood/PROD.KEYS/releases/latest/download/prod.keys
+        #wget https://github.com/DeaconBlood/PROD.KEYS/releases/latest/download/prod.keys
+        wget https://github.com/DeaconBlood/PROD.KEYS/releases/download/KEYS/prod.keys
         wget https://github.com/zerofo/hacBrewPack/releases/latest/download/hacbrewpack
         sudo -E chmod +x ./hacbrewpack
         ./hacbrewpack -k prod.keys --exefsdir hblmenu_NSP/exefs/ --controldir hblmenu_NSP/  --titleid 010078787878100D --romfsdir hblmenu_NSP/romfs --nologo --nspdir output
