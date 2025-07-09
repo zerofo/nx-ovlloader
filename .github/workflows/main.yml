@@ -47,7 +47,7 @@ jobs:
         wget https://github.com/DeaconBlood/PROD.KEYS/releases/download/KEYS/prod.keys
         wget https://github.com/zerofo/hacBrewPack/releases/latest/download/hacbrewpack
         sudo -E chmod +x ./hacbrewpack
-        ./hacbrewpack -k prod.keys --exefsdir hblmenu_NSP/exefs/ --controldir hblmenu_NSP/ --titleid 010078787878100D --noromfs --nologo --nspdir output
+        ./hacbrewpack -k prod.keys --exefsdir hblmenu_NSP/exefs/ --controldir hblmenu_NSP/control/ --titleid 010078787878100D --noromfs --nologo --nspdir output
         mv ./output/010078787878100d.nsp ./output/hblmenu-NSP_010078787878100d.nsp
     - name: Upload file
       uses: actions/upload-artifact@v4
