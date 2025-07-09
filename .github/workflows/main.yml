@@ -21,6 +21,10 @@ jobs:
     #   with:
     #     msg: ${{ github.repository }}
     #     separator: '/'
+    - name: DateTime
+      run: |
+        echo "date=$(TZ='Asia/Shanghai' date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
+      id: date
     - name: Checkout
       uses: actions/checkout@master
       with:
@@ -62,3 +66,13 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.release_token }}
+        file: ./output/hblmenu-NSP_010078787878100d.nsp
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+        repo_name: zerofo/ATM_ZxNs
+        release_name:  ATM_ZxNs_update-URL
