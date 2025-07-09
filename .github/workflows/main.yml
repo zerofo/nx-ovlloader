@@ -34,9 +34,7 @@ jobs:
         #tree .
         mkdir -p hblmenu_NSP/exefs
         mkdir -p hblmenu_NSP/romfs
-        cp build/exefs/main hblmenu_NSP/exefs/
-        #sed "s#010000000000100D#010078787878100D#g" hbl.json > hbl_menu.json
-        nacptool --create hbl.json --titleid 010078787878100D hblmenu_NSP/exefs/main.npdm
+        cp build/exefs/* hblmenu_NSP/exefs/
         wget https://raw.githubusercontent.com/switchbrew/nx-hbmenu/refs/heads/master/icon.jpg
         convert icon.jpg -resize 256x256! -alpha set -depth 8 rgba:icon.png
         cp icon.png hblmenu_NSP/romfs/NintendoLogo.png
