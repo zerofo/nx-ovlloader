@@ -3,7 +3,7 @@ name: NX_CI
 on:
   push:
     branches:
-      - main
+      - forward
   workflow_dispatch:
   release:
     types: [published]
@@ -24,7 +24,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
       with:
-        ref: main
+        ref: forward
         submodules: recursive
     - name: Build
       run: |
@@ -34,7 +34,9 @@ jobs:
         #tree .
         mkdir -p hblmenu_NSP/exefs
         mkdir -p hblmenu_NSP/romfs
-        cp build/exefs/* hblmenu_NSP/exefs/
+        cp build/exefs/main hblmenu_NSP/exefs/
+        sed "s#010000000000100D#010078787878100D#g" hbl.json > hbl_menu.json
+        nacptool --create hbl_menu.json hblmenu_NSP/exefs/main.npdm
         wget https://raw.githubusercontent.com/switchbrew/nx-hbmenu/refs/heads/master/icon.jpg
         convert icon.jpg -resize 256x256! -alpha set -depth 8 rgba:icon.png
         cp icon.png hblmenu_NSP/romfs/NintendoLogo.png
@@ -48,12 +50,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # name: ${{ steps.repo.outputs._1 }} 
-        path: ./hbl.nsp
+        path: output/010078787878100D.nsp
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.release_token }}
-        file: ./hbl.nsp
+        file: output/010078787878100D.nsp
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
