@@ -33,12 +33,13 @@ jobs:
         apt install imagemagick tree -y
         #tree .
         mkdir -p hblmenu_NSP/exefs
+        mkdir -p hblmenu_NSP/control
         cp build/exefs/* hblmenu_NSP/exefs/
        
         npdmtool hbl.json hblmenu_NSP/exefs/main.npdm
         
         wget https://raw.githubusercontent.com/switchbrew/nx-hbmenu/refs/heads/master/icon.jpg
-        convert icon.jpg -resize 256x256! -alpha set -depth 8 rgba:icon_AmericanEnglish.jpg
+        convert icon.jpg -resize 256x256 icon_AmericanEnglish.jpg
         cp icon_AmericanEnglish.jpg hblmenu_NSP/control/icon_AmericanEnglish.dat
         nacptool --create "hblmenu" "zerofo" "v0.1" hblmenu_NSP/control/control.nacp 
         ################### packing NSP #####################
