@@ -3,7 +3,7 @@ name: NX_CI
 on:
   push:
     branches:
-      - main
+      - sphaira
   workflow_dispatch:
   release:
     types: [published]
@@ -24,7 +24,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
       with:
-        ref: main
+        ref: sphaira
         submodules: recursive
     - name: Build
       run: |
