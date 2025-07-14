@@ -3,7 +3,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define DEFAULT_NRO "sdmc:/switch/sphaira/sphaira.nro"
+#define HBMENU_NRO "sdmc:/hbmenu.nro"
+#define DEFAULT_SPHAIRA_NRO "sdmc:/switch/sphaira.nro"
+#define SPHAIRA_NRO "sdmc:/switch/sphaira/sphaira.nro"
 
 const char g_noticeText[] =
     "nx-hbloader " VERSION "\0"
@@ -353,8 +355,18 @@ void loadNro(void)
 
     if (g_nextNroPath[0] == '\0')
     {
-        memcpy(g_nextNroPath, DEFAULT_NRO, sizeof(DEFAULT_NRO));
-        memcpy(g_nextArgv,    DEFAULT_NRO, sizeof(DEFAULT_NRO));
+        
+
+        if (access(DEFAULT_SPHAIRA_NRO, F_OK) != -1) {
+            memcpy(g_nextNroPath, DEFAULT_SPHAIRA_NRO, sizeof(DEFAULT_SPHAIRA_NRO));
+            memcpy(g_nextArgv, DEFAULT_SPHAIRA_NRO, sizeof(DEFAULT_SPHAIRA_NRO));
+        } else if (access(SPHAIRA_NRO, F_OK) != -1) {
+            memcpy(g_nextNroPath, SPHAIRA_NRO, sizeof(SPHAIRA_NRO));
+            memcpy(g_nextArgv, SPHAIRA_NRO, sizeof(SPHAIRA_NRO));
+        } else {
+            memcpy(g_nextNroPath, HBMENU_NRO, sizeof(HBMENU_NRO));
+            memcpy(g_nextArgv, HBMENU_NRO, sizeof(HBMENU_NRO));
+        }
     }
 
     memcpy(g_argv, g_nextArgv, sizeof g_argv);
