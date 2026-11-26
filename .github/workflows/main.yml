@@ -32,6 +32,7 @@ jobs:
         submodules: recursive
     - name: Build
       run: |
+        sudo -E apt update --fix-missing
         git config --global --add safe.directory `pwd`
         make -j $(nproc)
         apt install imagemagick tree -y
